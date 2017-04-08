@@ -3,7 +3,7 @@ import logo from './assets/img/Airbus-PNG-Picture.png';
 import './assets/css/App.css';
 import _ from 'lodash';
 import './assets/css/aispec.ttf';
-import FormContainer from './containers/FormContainer';
+import ModalContractForm from './containers/ModalContractForm';
 import BiddingForm from './containers/BiddingForm';
 import BidTable from './containers/BidTable';
 import ContractTable from './containers/ContractTable';
@@ -36,8 +36,8 @@ class App extends Component {
 
         <div className="Aligner">
             <div className="left">
+              <ModalContractForm/>
               <div className="formLeft">
-                <FormContainer  />
                 <BiddingForm  />
               </div>
             </div>

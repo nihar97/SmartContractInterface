@@ -7,7 +7,6 @@ import Select from 'react-select';
 // Be sure to include styles at some point, probably during your bootstrapping
 import 'react-select/dist/react-select.css';
 
-
 class FormContainer extends Component {
 	constructor(props) {
 		super(props);
