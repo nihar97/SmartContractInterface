@@ -3,6 +3,7 @@ contract SmartContract {
     Contract[] public contracts; //create array of contracts
     //Bid[] public bids;
     mapping(uint => Bid[]) bidMap;
+    mapping(uint => Bid) bids;
     uint count;
     /*struct Date {
         uint day;
@@ -16,6 +17,8 @@ contract SmartContract {
         uint targetPrice;
         uint targetTime;
         bytes32 ef1;
+        bool open
+        uint bidID
         //bytes32 supplier;
         /*Date date;*/
     }
@@ -37,9 +40,10 @@ contract SmartContract {
         newContract.quantity = _quantity;
         newContract.targetPrice = _targetPrice;
         newContract.targetTime = _targetTime;
-
+        newContract.open = true;
         bytes32 extraField1 = "";
         newContract.ef1 = extraField1;
+        newContract.bidID = 0;
         /*_date.day = _day;
         _date.month = _month;
         _date.year = _year;*/
@@ -54,8 +58,11 @@ contract SmartContract {
       contracts[_cid].ef1 = _extraField;
       return true;
     }
-
+//bidid is calculated
     function bid(uint cid, bytes32 _supplier, uint _price, uint _bidTime) returns (bool success) {
+        if(contracts[cid].open == false){
+          return false;
+        }
         Bid memory newBid;
         newBid.contractId = cid;
         newBid.supplier = _supplier;
@@ -63,6 +70,7 @@ contract SmartContract {
         newBid.bidTime = _bidTime;
         newBid.owner = msg.sender;
         bidMap[cid].push(newBid);
+        bids[bidMap[cid].length] = newBid;
         return true;
     }
     function getContracts() constant returns (uint[], bytes32[], uint[], uint[], uint[], bytes32[]) {
@@ -73,6 +81,8 @@ contract SmartContract {
         uint[] memory targetPrice = new uint[](length);
         uint[] memory targetTime = new uint[](length);
         bytes32[] memory extraField1 = new bytes32[](length);
+        bool[] memory open = new bool[](length);
+        uint[] memory bidID = new uint[](length);
         //bytes32[] memory supplier = new bytes32[](length);
         /*Date[] memory date = new Date[](length);*/
         for (uint i = 0; i < contracts.length; i++) {
@@ -84,10 +94,12 @@ contract SmartContract {
             targetPrice[i] = currentContract.targetPrice;
             targetTime[i] = currentContract.targetTime;
             extraField1[i] = currentContract.ef1;
+            open[i] = currentContract.open;
+            bidID[i] = currentContract.bidID;
             //supplier[i] = currentContract.supplier;
             /*date[i] = currentContract.date;*/
         }
-        return (contractId, asset, qty, targetPrice, targetTime, extraField1);
+        return (contractId, asset, qty, targetPrice, targetTime, extraField1, open, bidID);
     }
     function getBids(uint contractId) constant returns (uint[], bytes32[], uint[], uint[]){
         uint length = bidMap[contractId].length;
@@ -103,5 +115,17 @@ contract SmartContract {
             timesToComplete[i] = bids[i].bidTime;
         }
         return (contractIds, suppliers, prices, timesToComplete);
+    }
+
+    //function to close contract
+    function closeContract(uint _contractId, uint _bidID) constant returns (bool success){
+      con = Contract[_contractId];
+      bid = bids(_bidID);
+      if (bid.contractId != _contractId){
+        return false;
+      }
+      con.open = false;
+      con.bidID = _bidID;
+      return true;
     }
 }
